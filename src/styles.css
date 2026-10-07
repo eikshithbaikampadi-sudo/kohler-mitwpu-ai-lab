@@ -12,7 +12,7 @@
   --line: #d7d4cb;
   --serif: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --header-height: 57.6px;
-  --bottom-nav-height: 64px;
+  --bottom-nav-height: 51.2px;
 }
 
 * { box-sizing: border-box; }
@@ -502,7 +502,7 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 @media (max-width: 580px) {
-  :root { --header-height: 46.4px; --bottom-nav-height: 58px; }
+  :root { --header-height: 46.4px; --bottom-nav-height: 46.4px; }
   .brand { gap: 8px; }
   .brand-kohler { font-size: 16.5px; }
   .brand-partner { font-size: 8.8px; }
