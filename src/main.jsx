@@ -497,7 +497,7 @@ function MilestoneTimeline() {
   );
 }
 
-function VideoScreen({ onEnded }) {
+function VideoScreen({ onEnded, background }) {
   const videoRef = useRef(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [playError, setPlayError] = useState("");
@@ -514,12 +514,12 @@ function VideoScreen({ onEnded }) {
   };
 
   return (
-    <section className="video-screen" aria-label="AI Lab video">
+    <section className="video-screen" aria-label="AI Lab video" style={{ "--video-background": background }}>
       <div className="video-frame">
         <video
           ref={videoRef}
-          src="/assets/KxMIT.mp4"
-          poster="/assets/thumbnail.png"
+          src={`${import.meta.env.BASE_URL}assets/KxMIT.mp4`}
+          poster={`${import.meta.env.BASE_URL}assets/thumbnail.png`}
           controls={hasStarted}
           playsInline
           preload="metadata"
@@ -538,7 +538,13 @@ function VideoScreen({ onEnded }) {
 
 function CaseStudiesScreen() {
   return (
-    <section className="case-studies-screen" aria-labelledby="case-studies-title">
+    <section
+      className="case-studies-screen"
+      aria-labelledby="case-studies-title"
+      style={{
+        "--case-studies-background": `url("${import.meta.env.BASE_URL}assets/bg1.avif")`,
+      }}
+    >
       <div className="case-studies-background" aria-hidden="true" />
       <div className="case-studies-heading">
         <p className="case-studies-eyebrow">STUDENT EVALUATION</p>
@@ -591,7 +597,10 @@ function App() {
       <Header activeScreen={activeScreen} />
       <main className="presentation">
         {activeScreen === "video"
-          ? <VideoScreen onEnded={() => navigateScreen(1)} />
+          ? <VideoScreen
+              onEnded={() => navigateScreen(1)}
+              background={`url("${import.meta.env.BASE_URL}assets/bg2.avif")`}
+            />
           : activeScreen === "timeline" ? <Cover /> : <CaseStudiesScreen />}
       </main>
       <ScreenNavigator
