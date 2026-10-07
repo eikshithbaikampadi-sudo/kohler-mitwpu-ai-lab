@@ -11,6 +11,30 @@ const stages = [
   { label: "LAUNCH", date: "OCT", slide: 9, icon: "🚀" },
 ];
 
+const screens = [
+  { id: "video", label: "AI Lab" },
+  { id: "timeline", label: "Timeline" },
+  { id: "cases", label: "Case Studies" },
+];
+
+const caseStudies = [
+  {
+    track: "TRACK 01",
+    title: "KOHLER AI Bathroom Designer & Planner",
+    objective: "Build an interactive AI design assistant that takes a customer's constraints and automates personalized product bundle recommendations.",
+  },
+  {
+    track: "TRACK 02",
+    title: "Commercial Smart Facility & Sustainability Manager",
+    objective: "Build a real-time IoT monitoring and predictive dispatch platform for high-footfall environments such as airports, hospitals, and universities.",
+  },
+  {
+    track: "TRACK 03",
+    title: "Kohler Unified Enterprise AI Agent",
+    objective: "Build an enterprise-grade conversational AI agent that answers complex queries across internal and external domains, with dynamic output formatting.",
+  },
+];
+
 const slideTitles = [
   "KOHLER × MIT-WPU AI Lab",
   "One Idea. Seven Months. One AI Lab.",
@@ -54,43 +78,50 @@ const evaluationCriteria = [
   ["Communication", "Ability to explain the solution and its impact"],
 ];
 
-function Header({ activeSlide, navigate }) {
+function Header({ activeScreen }) {
   return (
     <header className="site-header">
-      <a className="brand" href="#slide-0" onClick={(event) => {
-        event.preventDefault();
-        navigate(0);
-      }} aria-label="Kohler MIT-WPU AI Lab, presentation cover">
+      <a className="brand" href="#video" aria-label="Kohler MIT-WPU AI Lab, video">
         <span className="brand-kohler">KOHLER</span>
         <span className="brand-divider" />
         <span className="brand-partner">MIT-WPU</span>
         <span className="brand-lab">AI LAB</span>
       </a>
-      <div className="header-controls">
-        <span className="deck-label">STUDENT JOURNEY · 2026</span>
-        <button
-          className="arrow-button"
-          type="button"
-          onClick={() => navigate(activeSlide - 1)}
-          disabled={activeSlide === 0}
-          aria-label="Previous slide"
-        >
-          ←
-        </button>
-        <span className="slide-count">
-          {String(activeSlide + 1).padStart(2, "0")} <i>/</i> 13
-        </span>
-        <button
-          className="arrow-button"
-          type="button"
-          onClick={() => navigate(activeSlide + 1)}
-          disabled={activeSlide === slideTitles.length - 1}
-          aria-label="Next slide"
-        >
-          →
-        </button>
-      </div>
+      <nav className="page-nav" aria-label="Main navigation">
+        <a href="#video" aria-current={activeScreen === "video" ? "page" : undefined}>AI Lab</a>
+        <a href="#timeline" aria-current={activeScreen === "timeline" ? "page" : undefined}>Timeline</a>
+        <a href="#cases" aria-current={activeScreen === "cases" ? "page" : undefined}>Case Studies</a>
+      </nav>
     </header>
+  );
+}
+
+function ScreenNavigator({ activeScreen, navigate }) {
+  const activeIndex = screens.findIndex((screen) => screen.id === activeScreen);
+  const activeLabel = screens[activeIndex]?.label ?? screens[0].label;
+
+  return (
+    <nav className="screen-navigator" aria-label="Screen navigation">
+      <button
+        type="button"
+        onClick={() => navigate((activeIndex - 1 + screens.length) % screens.length)}
+        aria-label="Previous screen"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 12H5m0 0 7-7m-7 7 7 7" />
+        </svg>
+      </button>
+      <span aria-live="polite">{activeLabel}</span>
+      <button
+        type="button"
+        onClick={() => navigate((activeIndex + 1) % screens.length)}
+        aria-label="Next screen"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h14m0 0-7-7m7 7-7 7" />
+        </svg>
+      </button>
+    </nav>
   );
 }
 
@@ -116,17 +147,9 @@ function Cover() {
     <section className="slide cover-slide" id="slide-0" aria-label="Slide 1: Cover">
       <div className="cover-image" />
       <div className="cover-content">
-        <Eyebrow light>MIT WORLD PEACE UNIVERSITY · PUNE, INDIA</Eyebrow>
         <h1>KOHLER <span>×</span><br />MIT-WPU <em>AI Lab</em></h1>
-        <p className="cover-title">Student Journey 2026</p>
-        <p className="cover-subtitle">From Idea → Partnership → Innovation → Launch</p>
-        <span className="cover-date">MARCH — OCTOBER 2026</span>
-        <div className="cover-rule" />
-        <p className="cover-promise">
-          Building the next generation of AI talent through real-world innovation
-        </p>
+        <MilestoneTimeline />
       </div>
-      <span className="cover-index">01 / 13</span>
     </section>
   );
 }
@@ -460,107 +483,121 @@ const slideComponents = [
   ClosingSlide,
 ];
 
-function StageTimeline({ activeStage, navigate }) {
+function MilestoneTimeline() {
   return (
-    <nav className="stage-timeline" aria-label="Presentation journey stages">
-      <div className="timeline-track" aria-hidden="true"><span style={{ width: `${(activeStage / (stages.length - 1)) * 100}%` }} /></div>
-      {stages.map((stage, index) => (
-        <button
-          className={`stage-button${activeStage === index ? " active" : ""}${index < activeStage ? " passed" : ""}`}
-          key={stage.label}
-          type="button"
-          onClick={() => navigate(stage.slide)}
-          aria-current={activeStage === index ? "step" : undefined}
-          aria-label={`Go to ${stage.label}, ${stage.date}`}
-        >
-          <span className="stage-icon">{stage.icon}</span>
-          <span className="stage-text"><strong>{stage.label}</strong><small>{stage.date}</small></span>
-        </button>
+    <ol className="milestone-timeline" aria-label="AI Lab milestones">
+      {stages.map((stage) => (
+        <li key={stage.label}>
+          <span className="milestone-date">{stage.date}</span>
+          <span className="milestone-node" aria-hidden="true" />
+          <span className="milestone-label">{stage.label}</span>
+        </li>
       ))}
-    </nav>
+    </ol>
+  );
+}
+
+function VideoScreen({ onEnded }) {
+  const videoRef = useRef(null);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [playError, setPlayError] = useState("");
+
+  const startVideo = async () => {
+    if (!videoRef.current) return;
+    try {
+      await videoRef.current.play();
+      setHasStarted(true);
+      setPlayError("");
+    } catch {
+      setPlayError("The video could not be played. Please try again.");
+    }
+  };
+
+  return (
+    <section className="video-screen" aria-label="AI Lab video">
+      <div className="video-frame">
+        <video
+          ref={videoRef}
+          src="/assets/KxMIT.mp4"
+          poster="/assets/thumbnail.png"
+          controls={hasStarted}
+          playsInline
+          preload="metadata"
+          onEnded={onEnded}
+        />
+        {!hasStarted && (
+          <button className="video-play" type="button" onClick={startVideo} aria-label="Play AI Lab video">
+            <span aria-hidden="true">▶</span>
+          </button>
+        )}
+        {playError && <p className="video-error" role="alert">{playError}</p>}
+      </div>
+    </section>
+  );
+}
+
+function CaseStudiesScreen() {
+  return (
+    <section className="case-studies-screen" aria-labelledby="case-studies-title">
+      <div className="case-studies-background" aria-hidden="true" />
+      <div className="case-studies-heading">
+        <p className="case-studies-eyebrow">STUDENT EVALUATION</p>
+        <h1 id="case-studies-title">Case Study Challenge</h1>
+      </div>
+      <div className="case-study-grid">
+        {caseStudies.map((study) => (
+          <article className="case-study-card" key={study.track}>
+            <p className="case-study-track">{study.track}</p>
+            <h2>{study.title}</h2>
+            <section className="case-study-section">
+              <h3>OBJECTIVE</h3>
+              <p>{study.objective}</p>
+            </section>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
 function App() {
-  const [activeSlide, setActiveSlide] = useState(0);
-  const sectionRefs = useRef([]);
-  const activeSlideRef = useRef(0);
-  const navigate = (index) => {
-    const next = Math.max(0, Math.min(index, slideComponents.length - 1));
-    sectionRefs.current[next]?.scrollIntoView({ behavior: "smooth", block: "start" });
-    setActiveSlide(next);
-    activeSlideRef.current = next;
-  };
+  const [activeScreen, setActiveScreen] = useState(() => (
+    window.location.hash === "#timeline"
+      ? "timeline"
+      : window.location.hash === "#cases" ? "cases" : "video"
+  ));
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (!visible) return;
-      const index = Number(visible.target.dataset.slideIndex);
-      activeSlideRef.current = index;
-      setActiveSlide(index);
-      if (window.location.hash !== `#slide-${index}`) {
-        window.history.replaceState(null, "", `#slide-${index}`);
-      }
-    }, { threshold: [0.25, 0.5, 0.75] });
-
-    sectionRefs.current.forEach((section) => section && observer.observe(section));
-
-    const initialIndex = Number(window.location.hash.replace("#slide-", ""));
-    if (window.location.hash.startsWith("#slide-") && Number.isInteger(initialIndex)) {
-      requestAnimationFrame(() => navigate(initialIndex));
-    }
-
-    const onKeyDown = (event) => {
-      if (
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey ||
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLTextAreaElement ||
-        event.target instanceof HTMLSelectElement ||
-        (event.target instanceof HTMLElement && event.target.isContentEditable)
-      ) return;
-      if (event.key === "ArrowRight" || event.key === "PageDown") {
-        event.preventDefault();
-        navigate(activeSlideRef.current + 1);
-      } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
-        event.preventDefault();
-        navigate(activeSlideRef.current - 1);
-      } else if (event.key === "Home") {
-        event.preventDefault();
-        navigate(0);
-      } else if (event.key === "End") {
-        event.preventDefault();
-        navigate(slideComponents.length - 1);
-      }
+    const syncScreen = () => {
+      setActiveScreen(
+        window.location.hash === "#timeline"
+          ? "timeline"
+          : window.location.hash === "#cases" ? "cases" : "video",
+      );
     };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("keydown", onKeyDown);
-    };
+    window.addEventListener("hashchange", syncScreen);
+    return () => window.removeEventListener("hashchange", syncScreen);
   }, []);
+
+  const navigateScreen = (index) => {
+    const nextScreen = screens[index];
+    if (!nextScreen) return;
+    window.location.hash = nextScreen.id;
+    setActiveScreen(nextScreen.id);
+  };
 
   return (
     <>
-      <Header activeSlide={activeSlide} navigate={navigate} />
+      <Header activeScreen={activeScreen} />
       <main className="presentation">
-        {slideComponents.map((Slide, index) => (
-          <div
-            className="slide-wrap"
-            key={slideTitles[index]}
-            data-slide-index={index}
-            ref={(element) => { sectionRefs.current[index] = element; }}
-          >
-            <Slide />
-          </div>
-        ))}
+        {activeScreen === "video"
+          ? <VideoScreen onEnded={() => navigateScreen(1)} />
+          : activeScreen === "timeline" ? <Cover /> : <CaseStudiesScreen />}
       </main>
-      <StageTimeline activeStage={slideStages[activeSlide]} navigate={navigate} />
+      <ScreenNavigator
+        activeScreen={activeScreen}
+        navigate={navigateScreen}
+      />
     </>
   );
 }
